@@ -52,14 +52,15 @@ def precipitation():
     session = Session(engine)
 
     # Query for the dates and precipitation values
-    last_date = session.query(func.max(Measurement.date)).first()[0]
+    # last_date = session.query(func.max(Measurement.date)).first()[0]
 
-    x = last_date.split("-")
-    for i in range(0, len(x)):
-        x[i] = int(x[i])
+    # x = last_date.split("-")
+    # for i in range(0, len(x)):
+    #     x[i] = int(x[i])
 
-    year_ago_date = (dt.date(x[0], x[1], x[2]) - dt.timedelta(days = 365))
-    prcp_data = session.query(Measurement.date, Measurement.prcp).filter(Measurement.date >= year_ago_date).all()
+    # year_ago_date = (dt.date(x[0], x[1], x[2]) - dt.timedelta(days = 365))
+    # prcp_data = session.query(Measurement.date, Measurement.prcp).filter(Measurement.date >= year_ago_date).all()
+    prcp_data = session.query(Measurement.date, Measurement.prcp).all()
 
     session.close()
 
