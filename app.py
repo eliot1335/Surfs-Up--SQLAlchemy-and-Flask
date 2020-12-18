@@ -37,8 +37,11 @@ def welcome():
         f"/api/v1.0/precipitation<br/>"
         f"/api/v1.0/stations<br/>"
         f"/api/v1.0/tobs<br/>"
-        f"/api/v1.0/<start><br/>"
-        f"/api/v1.0/<start>/<end><br/>"
+        f"/api/v1.0/start_date<br/>"
+        f"/api/v1.0/start_date/end_date<br/>"
+        f" <br/>"
+        f"start_date (string): A date string in the format %Y-%m-%d<br/>"
+        f"end_date (string): A date string in the format %Y-%m-%d<br/>"
     )
 
 # ---------------------------------------------------------------------
@@ -67,7 +70,7 @@ def precipitation():
         prcp_dict = {}
         prcp_dict["date"] = date
         prcp_dict["prcp"] = prcp
-        prcp_date_list.append(prcp_dict)
+        prcp_data_list.append(prcp_dict)
 
     return jsonify(prcp_data_list)
 
