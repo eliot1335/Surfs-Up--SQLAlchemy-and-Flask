@@ -26,6 +26,8 @@ Station = Base.classes.station
 # Setup Flask
 app = Flask(__name__)
 
+# ---------------------------------------------------------------------
+
 # Home Page
 @app.route("/")
 def welcome():
@@ -39,6 +41,7 @@ def welcome():
         f"/api/v1.0/<start>/<end><br/>"
     )
 
+# ---------------------------------------------------------------------
 # Precipitation API page
 @app.route("/api/v1.0/precipitation")
 def precipitation():
@@ -68,8 +71,8 @@ def precipitation():
 
     return jsonify(prcp_data_list)
 
-
-
+# ---------------------------------------------------------------------
+# Stations API page
 @app.route("/api/v1.0/stations")
 def stations():
     # Create our session (link) from Python to the DB
@@ -93,8 +96,8 @@ def stations():
 
     return jsonify(stations_list)
 
-
-
+# ---------------------------------------------------------------------
+# Most active station TOBS API page
 @app.route("/api/v1.0/tobs")
 def tobs():
     # Create our session (link) from Python to the DB
@@ -109,10 +112,11 @@ def tobs():
 
     year_ago_date = (dt.date(x[0], x[1], x[2]) - dt.timedelta(days = 365))
 
-    station_tobs_counts = session.query(Measurement.station, Station.name, func.count(Measurement.station)).\
-        filter(Measurement.station == Station.station).\
-            group_by(Measurement.station).\
-                order_by(func.count(Measurement.station).desc()).all()
+    station_tobs_counts = session.query(Measurement.station, Station.name, \
+        func.count(Measurement.station)).\
+            filter(Measurement.station == Station.station).\
+                group_by(Measurement.station).\
+                    order_by(func.count(Measurement.station).desc()).all()
 
     most_active_station_id = station_tobs_counts[0][0]
 
@@ -132,6 +136,63 @@ def tobs():
 
     return jsonify(tobs_list)
 
+# ---------------------------------------------------------------------
+# Date querying API page, start date only
+@app.route("/api/v1.0/<start>")
+def tobs_start(start):
+    # Create our session (link) from Python to the DB
+    session = Session(engine)
+
+    tobs_start_list = []
+
+    results =   session.query(Measurement.date,\
+        func.min(Measurement.tobs), \
+            func.avg(Measurement.tobs), \
+                func.max(Measurement.tobs)).\
+                    filter(Measurement.date >= start).\
+                        group_by(Measurement.date).all()
+    
+    session.close()    
+
+    for date, min, avg, max in results:
+        tobs_start_dict = {}
+        tobs_start_dict["Date"] = date
+        tobs_start_dict["TMIN"] = min
+        tobs_start_dict["TAVG"] = avg
+        tobs_start_dict["TMAX"] = max
+        tobs_start_list.append(tobs_start_dict)
+
+    return jsonify(tobs_start_list)
+
+# ---------------------------------------------------------------------
+# Date querying API page, start and end date
+@app.route("/api/v1.0/<start>/<end>")
+def tobs_stat_start_end(start,end):
+    # Create our session (link) from Python to the DB
+    session = Session(engine)
+
+    tobs_start_end_list = []
+
+    results =   session.query(Measurement.date,\
+        func.min(Measurement.tobs), \
+            func.avg(Measurement.tobs), \
+                func.max(Measurement.tobs)).\
+                    filter(Measurement.date >= start, Measurement.date <= end).\
+                        group_by(Measurement.date).all()
+
+    session.close()    
+
+    for date, min, avg, max in results:
+        tobs_start_end_dict = {}
+        tobs_start_end_dict["Date"] = date
+        tobs_start_end_dict["TMIN"] = min
+        tobs_start_end_dict["TAVG"] = avg
+        tobs_start_end_dict["TMAX"] = max
+        tobs_start_end_list.append(tobs_start_end_dict)
+
+    return jsonify(tobs_start_end_list)
+
+# ---------------------------------------------------------------------
 
 if __name__ == '__main__':
     app.run(debug=True)
