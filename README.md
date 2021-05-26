@@ -1,6 +1,6 @@
-# SQLAlchemy Homework - Surfs Up!
+# Surfs Up! -  SQLAlchemy
 
-In this homework exercise, we will be practicing how to interact with ORM using sqlalchemy and sqlite.
+In this exercise, we will be practicing how to interact with ORM using sqlalchemy and sqlite.
 The exercise breaks down to two parts: 
 - the climate_starter.ipynb notebook file where we create engine and query the data, then stuff them into pandas dataframe for further analysis and matplotlib plotting.
 - the app.py file where we create API site providing json data using flask package.
